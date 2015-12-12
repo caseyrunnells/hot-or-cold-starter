@@ -1,89 +1,114 @@
-// Button JS - place in app
+var secretNumber = null,
+    guessCount = null;
 
 $(document).ready(function(){
-   
-    //raw JS way
-//     var buttonThing = document.getElementById("guessButton");
-//     guessButton.addEventListener("click", readInput);
-//     function (){
-//       console.log('hello');
-//   }
     
-    $('#guessButton').click(function(){
-      console.log("hello");
-        console.log($('#userGuess').val()); 
-//       make sure this value is right before proceeding
-         var answerFeedBack = parseInt(document.getElementById("user-input").textContent();
-        
-        
+    /*--- Display information modal box ---*/
+    $(".what").click(function(){
+        $(".overlay").fadeIn(1000);
+
     });
-    
+
+    /*--- Hide information modal box ---*/
+    $("a.close").click(function(){
+        $(".overlay").fadeOut(1000);
+    });
+
+    /*--- Start a new game ---*/
+    $(".new").click(function(){
+        newGame();
+    });
+
+    /*--- Check users guess - click ---*/
+    $("form .button").click(function(){
+        checkGuess();
+    });
+
+    /*--- Check users guess - click ---*/
+    $(document).keypress(function(e){
+        if(e.which == 13) {
+            e.preventDefault();
+            checkGuess();
+        }
+    });
+
+    /* -- On input change - valid number --*/
+    $('#userGuess').change(function() {
+        var value = parseInt($('#userGuess').val(), 10);
+
+        if (value < 0 || value > 100) {
+            alert('Please enter a valid number between 1 and 100');
+        }
+    });
+
+    newGame();
 });
 
+function newGame() {
+    resetGame();
+    setRandomNumner();
+}
 
-//ACtual Code - Start Here 
+function setRandomNumner() {
+    secretNumber = Math.floor((Math.random() * 100) + 1);
+}
 
-// $(document).ready(function(){
+function resetGame() {
+    count = 0;
+    secretNumber = null;
 
-//    $('guessButton').click(function)
-  
-//   /*--- Display information modal box ---*/
-//     $(".what").click(function(){
-//       $(".overlay").fadeIn(1000);
+    $('#feedback').css('background-color', '#cc324b');
+    $('#userGuess').val('');
+    $('#count').text(count);
+    $('#guessList').empty();
+}
 
-//     });
+function getGuess() {
+    return parseInt($('#userGuess').val(), 10);
+}
 
-//     /*--- Hide information modal box ---*/
-//     $("a.close").click(function(){
-//       $(".overlay").fadeOut(1000);
-//     });
+function updateCount() {
+    count = count + 1;
 
-// });
+    $('#count').text(count);
+}
 
+function checkNumber() {
+    var guess = getGuess();
 
+    if (guess === secretNumber) {
+        return 'correct';
+    } else if (guess < secretNumber) {
+        return 'low';
+    }
 
-    function answerFeedBack(delta){
-        
-         if (delta > 20){
-         return "Cold!";
-        }
-         if (delta <= 20 && delta > 10){
-  
-         console.log('warm!');
-       }        
-         if (delta <= 10){
-  
-         console.log('hot!');
-       }
-     }
+    return 'high';
+}
 
+function updateGuess() {
+    $('#guessList').prepend($('<li />').text(getGuess()));
+}
 
+function updateFeedback() {
+    var feedback = checkNumber(),
+        $feedback = $('#feedback');
 
-     function mainGame(){
-         var ask = document.getElementById("userGuess").value;
-         var rightAnswer = Math.random()*100;
-         var delta = Math.abs(rightAnswer - ask);
-         var numGuesses = 0;
-        
-         var guessesAllowed = 5;
-        
-         while(delta !== 0 || numGuesses === guessesAllowed){
-             numGuesses += 1;
-          var ask = prompt("Take a Guess");            
-       delta = Math.abs(rightAnswer - ask);    
-             document.getElementById("#answerContainer").textContent = answerFeedBack(delta);
-         }
-        
-         if (delta === 0 && numGuesses < guessesAllowed){
-             alert("Congratulations! You won a new car! It took you " + numGuesses + " guesses, so you win nothing!");
-         }
-     }
-        
-        
-//     function startNewGame(){
+    if (feedback === 'correct') {
+        $feedback.text('Correct!');
+        $feedback.css('background-color', 'green');
+        $('#guessButton').disable();
+    } else if (feedback === 'low') {
+        $feedback.text('Too Low');
+    } else if(feedback === 'high') {
+        $feedback.text('Too High');
+    }
 
-//     }
+    $('#userGuess').val('');
+     
+}
 
-//    mainGame();
-
-
+function checkGuess() {
+    updateCount();
+    updateGuess();
+    updateFeedback();
+}
